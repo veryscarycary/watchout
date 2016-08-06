@@ -17,10 +17,12 @@ var axes = {
   y: d3.scale.linear().domain([0, 100]).range([0, gameOptions.height]),
 };
 
-var gameBoard = d3.select('.container').append('svg:svg')
-  .attr('width', gameOptions.width)
-  .attr('height', gameOptions.height);
-
+var gameBoard = d3.select('.container')
+  .append('svg:svg')
+  .attr('width', gameOptions.width + 'px')
+  .attr('height', gameOptions.height + 'px')
+;
+console.log(gameBoard);
 var updateScore = () => {
   d3.select('#current-score').text(gameStats.score.toString());
 };
@@ -43,7 +45,7 @@ var Player = class Player {
   }
   render (to) {
     this.el = to.append('svg.path').attr('d', this.path).attr('fill', this.fill);
-    this.transform (this.gameoptions.width * 0.5, this.gameOptions.height * 0.5); 
+    this.transform (this.gameOptions.width * 0.5, this.gameOptions.height * 0.5); 
     this.setupDragging();
   }
   getX () {
@@ -68,7 +70,7 @@ var Player = class Player {
     this.angle = opts.angle || this.angle;
     this.setX(opts.x);
     this.setY(opts.y);
-    this.attr('transform', 'rotate(#{@angle},#{@getX()},#{@getY()}) ' +
+    this.el.attr('transform', 'rotate(#{@angle},#{@getX()},#{@getY()}) ' +
       'translate(#{@getX()},#{@getY()})');
   }
 
@@ -101,14 +103,89 @@ var createEnemies = () =>
     y: Math.random() * 100
   }));
 
-var render = (enemy_data) => {
+var render = enemyData => {
   var enemies = gameBoard.selectAll('circle.enemy')
-    .data(enemy_data, (d) => d.id);
+    .data(enemyData, (d) => d.id)
+  ;
 
-    enemies.enter()
-      .append('svg:circle')
-      .attr('class', 'enemy')
-      .attr('cx', (enemy) -> axes.x(enemy.x))
-      .attr('cy', (enemy) -> axes.y(enemy.y))
-      .attr('r', 0)
+  enemies.enter()
+    .append('svg:circle')
+    .attr('class', 'enemy')
+    .attr('cx', (enemy) => axes.x(enemy.x)) //enemy_data[i].x
+    .attr('cy', (enemy) => axes.y(enemy.y))
+    .attr('r', 0);
+
+  enemies.exit()
+    .remove();
+
+  var checkCollision = (enemy, collidedCallback) => {
+    _(players).each(player => {
+      radiusSum = parseFloat(enemy.attr('r')) + player.r;
+      xDiff = parseFloat(enemy.attr('cx')) - player.x;
+      yDiff = parseFloat(enemy.attr('cy')) - player.y;
+
+      separation = Math.sqrt( Math.pow(xDiff, 2) + Math.pow(yDiff, 2) );
+      separation < radiusSum && collidedCallback(player, enemy);
+    });
+  };
+
+  var onCollision = () => {
+    updateBestScore();
+    gameStats.score = 0;
+    updateScore();
+  };
+
+  var tweenWithCollisionDetection = (endData) => {
+    var enemy = d3.select(this);
+
+    var startPos = {
+      x: parseFloat(enemy.attr('cx')),
+      y: parseFloat(enemy.attr('cy'))
+    };
+
+    var endPos = {
+      x: axes.x(endData.x),
+      y: axes.y(endData.y)
+    };
+
+    return t => {
+      checkCollision(enemy, onCollision);
+
+      enemyNextPos = {
+        x: startPos.x + (endPos.x - startPos.x) * t,
+        y: startPos.y + (endPos.y - startPos.y) * t
+      };
+
+      enemy.attr('cx', enemyNextPos.x)
+        .attr('cy', enemyNextPos.y);
+    };
+  };
+
+  enemies
+    .transition()
+    .duration(500)
+    .attr('r', 10)
+    .transition()
+    .duration(2000)
+    .tween('custom', tweenWithCollisionDetection);
 };
+
+var play = () => {
+  var gameTurn = () => {
+    newEnemyPositions = createEnemies();
+    render(newEnemyPositions);
+  };
+
+  var increaseScore = () => {
+    gameStats.score++;
+    updateScore();
+  };
+
+  gameTurn();
+
+  setInterval(gameTurn, 2000);
+
+  setInterval(increaseScore, 50);
+};
+
+play();
