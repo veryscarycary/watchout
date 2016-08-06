@@ -1,3 +1,12 @@
+ // var drag = d3.behavior.drag()
+ //        .on("drag", function(d,i) {
+ //            d.x += d3.event.dx
+ //            d.y += d3.event.dy
+ //            d3.select(this).attr("transform", function(d,i){
+ //                return "translate(" + [ d.x,d.y ] + ")"
+ //            })
+ //        });
+
 var Player = class Player {
   constructor(gameOptions) {
     this.path = 'm-7.5,1.62413c0,-5.04095 4.08318,-9.12413 9.12414,-9.12413c5.04096,0 9.70345,5.53145 11.87586,9.12413c-2.02759,2.72372 -6.8349,9.12415 -11.87586,9.12415c-5.04096,0 -9.12414,-4.08318 -9.12414,-9.12415z';
@@ -10,9 +19,9 @@ var Player = class Player {
     this.el = null;
   }
   render (to) {
-    this.el = to.append('svg:path').attr('d', this.path).attr('fill', this.fill).attr('r', this.r);
+    this.el = to.append('svg:path').attr('d', this.path).attr('fill', this.fill).attr('r', this.r).call(this.setupDragging);
     this.transform (this.gameOptions.width * 0.5, this.gameOptions.height * 0.5); 
-    this.setupDragging();
+//    this.setupDragging();
   }
   getX () {
     return this.x;
@@ -36,12 +45,7 @@ var Player = class Player {
     this.angle = opts.angle || this.angle;
     this.setX(opts.x);
     this.setY(opts.y);
-    this.el.attr('cx', '100');
-    this.el.attr('cy', '100');
     this.el.attr('transform', d => 'translate(' + this.x + ',' + this.y + ')rotate(' + this.angle + ')');
-
-      // rotate(' + this.angle + ,#{@getX()},#{@getY()}) ' +
-      // 'translate(#{@getX()},#{@getY()})');
   }
 
   moveAbsolute (x, y) {
@@ -49,14 +53,28 @@ var Player = class Player {
   }
 
   moveRelative (dx, dy) {
-    transform({x: this.getX() + dx, y: this.getY() + dy, angle: 360 * (Math.atan2(dy, dx) / (Math.PI * 2))});  
+    transform({x: this.x + dx, y: this.y + dy, angle: 360 * (Math.atan2(dy, dx) / (Math.PI * 2))});  
+
   }
 
   setupDragging () {
-    // var dragMove = () =>
-    //   { this.moveRelative(d3.event.dx, d3.event.dy) };
+    var dragMove = (d, i) => { 
+      console.log('pass');
+      this.moveRelative(d3.event.x, d3.event.y); 
+    };
+    // debugger;
+    // var player = d3.select(this.el).attr('dragging', 'true');
 
-    //   var drag = d3.behavior.drag().on('drag', dragMove);
+    // d3.event.on('drag', dragged).on('end', ended);
+
+    // var dragged = function(d) {
+    //   player.raise().attr('cx', d.x = d3.event.x).attr('cy', d.y = d3.event.y);
+    // };
+
+    // var ended = function () {
+    //   player.classed('dragging', false);
+    // };
+    var drag = d3.behavior.drag().on('drag', dragMove);
 
       //COME BACK TO THIS
   }

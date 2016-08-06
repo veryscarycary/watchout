@@ -1,13 +1,14 @@
 var gameOptions = {
   height: 450,
   width: 700,
-  nEnemies: 30,
+  nEnemies: 40,
   padding: 20
 };
 
 var gameStats = {
   score: 0,
-  bestScore: 0
+  bestScore: 0,
+  collisions: 0
 };
 
 var axes = {
@@ -51,7 +52,8 @@ var render = enemyData => {
     .attr('class', 'enemy')
     .attr('cx', enemy => axes.x(enemy.x))
     .attr('cy', enemy => axes.y(enemy.y))
-    .attr('r', 0);
+    .attr('r', 0)
+    .attr('colliding', 'false');
 
   enemies.exit()
     .remove();
@@ -63,13 +65,21 @@ var render = enemyData => {
       yDiff = parseFloat(enemy.attr('cy')) - player.y;
 
       separation = Math.sqrt( Math.pow(xDiff, 2) + Math.pow(yDiff, 2) );
-      separation < radiusSum && collidedCallback(player, enemy);
+      var colliding = JSON.parse(enemy.attr('colliding')); 
+      if (separation < radiusSum && !colliding) {
+        enemy.attr('colliding', 'true');
+        collidedCallback(player, enemy);
+      } else if (separation >= radiusSum) {
+        enemy.attr('colliding', 'false');
+      }
     });
   };
 
-  var onCollision = () => {
+  var onCollision = (player, enemy) => {
     gameStats.score = 0;
+    gameStats.collisions++;
     updateScore();
+    d3.select('#collisions').select('span').text(() => gameStats.collisions.toString());
   };
 
   var tweenWithCollisionDetection = function(endData) {
@@ -97,9 +107,9 @@ var render = enemyData => {
   };
   enemies
     .transition()
-    .duration(500)
+    .duration(turnLength / 2)
     .attr('r', 10)
     .transition()
-    .duration(2000)
+    .duration(turnLength - 500)
     .tween('custom', tweenWithCollisionDetection);
 };

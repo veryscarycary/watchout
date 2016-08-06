@@ -4,6 +4,8 @@ players.push(new Player(gameOptions));
 players[players.length - 1].render(gameBoard);
 //players.push(new Player(gameOptions).render(gameBoard));
 
+var turnLength = 1500;
+
 var play = () => {
   var gameTurn = () => {
     render(createEnemies());
@@ -11,7 +13,7 @@ var play = () => {
   
   gameTurn();
 
-  setInterval(gameTurn, 2000);
+  setInterval(gameTurn, turnLength);
 
   setInterval(increaseScore, 50);
 
