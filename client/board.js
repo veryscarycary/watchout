@@ -21,13 +21,18 @@ var gameBoard = d3.select('.container')
   .attr('height', gameOptions.height + 'px')
 ;
 
+var increaseScore = () => {
+  gameStats.score++;
+  updateScore();
+  gameStats.score > gameStats.bestScore && updateBestScore();
+};
 var updateScore = () => {
-  d3.select('#current-score').text(gameStats.score.toString());
+  d3.select('#currentScore').select('span').text(() => gameStats.score.toString());
 };
 
 var updateBestScore = () => {
-  gameStats.bestScore = _.max([gameStats.bestScore, gameStats.score]);
-  d3.select('#best-score').text(gameStats.bestScore.toString());
+  gameStats.bestScore = gameStats.score;
+  d3.select('#highScore').select('span').text(() => gameStats.bestScore.toString());
 };
 
 var createEnemies = () =>
@@ -63,7 +68,6 @@ var render = enemyData => {
   };
 
   var onCollision = () => {
-    updateBestScore();
     gameStats.score = 0;
     updateScore();
   };
@@ -81,7 +85,7 @@ var render = enemyData => {
     };
 
     return t => {
-      //checkCollision(enemy, onCollision);
+      checkCollision(enemy, onCollision);
       enemyNextPos = {
         x: startPos.x + (endPos.x - startPos.x) * t,
         y: startPos.y + (endPos.y - startPos.y) * t
