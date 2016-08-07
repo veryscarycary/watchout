@@ -4,7 +4,7 @@ players.push(new Player(gameOptions));
 players[players.length - 1].render(gameBoard);
 //players.push(new Player(gameOptions).render(gameBoard));
 
-var turnLength = 1500;
+var turnLength = 2000;
 
 var play = () => {
   var gameTurn = () => {
