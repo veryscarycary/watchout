@@ -132,6 +132,6 @@ var render = enemyData => {
     .duration(turnLength / 2)
     .attr('r', 10)
     .transition()
-    .duration(1000)
+    .duration(1500)
     .tween('custom', tweenWithCollisionDetection);
 };

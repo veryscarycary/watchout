@@ -10,18 +10,21 @@ Feel free to use it if you like. */
   height: 450px;
 }
 
-h2 {
-  background-color: gray;
-  width: 700px;
-  height: 500px;
-}
-
 .enemy {
-    animation: spin 1s linear infinite;
+    -webkit-animation: spin 1s linear infinite;
+    -moz-animation: spin 1s linear infinite;
+    -o-animation: spin 1s linear infinite;
   }
-@keyframes spin { 0% { transform: rotate(0deg);
-  transform-origin: 50% 50%;}
-  100%{transform: rotate(360deg);
-    transform-origin: 50% 50%;}
+
+@-webkit-keyframes spin { 0% { -webkit-transform: rotate(0deg);
+  -webkit-transform-origin: 50% 50%;}
+  100%{-webkit-transform: rotate(360deg);
+    -webkit-transform-origin: 50% 50%;}
+  }
+
+@-moz-keyframes spin { 0% { -moz-transform: rotate(0deg);
+  -moz-transform-origin: 50% 50%;}
+  100%{-moz-transform: rotate(360deg);
+    -moz-transform-origin: 50% 50%;}
   }
 
