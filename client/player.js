@@ -30,7 +30,9 @@ var Player = class Player {
     if (x === undefined) { return; }
     let minX = this.gameOptions.padding;
     let maxX = this.gameOptions.width - this.gameOptions.padding;
-    this.x = x < minX ? minX : x > maxX ? maxX : x;
+    this.x = (x < minX ? minX : (x > maxX ? maxX : x));
+    // if current mouse x is past left padding, keep at padding
+    // else if current mouse x is to right of right padding, keep at padding
   }
   getY () {
     return this.y;
@@ -38,8 +40,10 @@ var Player = class Player {
   setY (y = this.y) {
     if (y === undefined) { return; }
     let minY = this.gameOptions.padding;
-    let maxY = this.gameOptions.width - this.gameOptions.padding;
-    this.y = y < minY ? minY : y > maxY ? maxY : y;
+    let maxY = this.gameOptions.height - this.gameOptions.padding;
+    this.y = (y < minY ? minY : (y > maxY ? maxY : y));
+    // if current mouse y is past top padding, keep at padding
+    // else if current mouse y is past lower padding, keep at padding
   }
   transform (opts) {
     //debugger;

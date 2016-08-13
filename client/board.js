@@ -84,8 +84,18 @@ var render = enemyData => {
       if (separation < radiusSum && !colliding) {
         enemy.attr('colliding', 'true');
         collidedCallback(player, enemy);
+        // d3.select('svg')
+        //   .transition()
+        //   .duration(30)
+        //   .style('background', 'white');
+        d3.select('svg')
+          .transition()
+          .duration(40)
+          .style('background', 'hsla(0, 100%, 43%, 0.8)');
       } else if (separation >= radiusSum) {
         enemy.attr('colliding', 'false');
+        d3.select('svg')
+          .style('background', 'linear-gradient(teal, yellow)');
       }
     });
   };
